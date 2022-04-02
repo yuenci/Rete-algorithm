@@ -2,10 +2,11 @@
 Author: Innis
 Description: graph class and method
 Date: 2022-04-02 09:31:06
-LastEditTime: 2022-04-02 14:32:35
+LastEditTime: 2022-04-02 14:44:10
 FilePath: \0328P-rete\0.5\graph.py
 '''
 
+from logging import exception
 from typing import Union, List, Dict
 from pprint import pprint
 from node import Alpha, Beta
@@ -264,12 +265,24 @@ class Graph:
             raise Exception(f"This rule has some problem: {rule}")
 
     def query(self, rule: str) -> str:
-        pattern_list: List = self.split_rule_pattern_to_list(rule)
-        biggest = self.find_the_biggest_beta_node(pattern_list)[0]
-        if biggest = None:
+
+        pattern_list: List = sorted(rule.strip().split(" "))
+        # if hvae duplicates
+        if len(self.get_duplicates(pattern_list)) > 0:
+            raise Exception(f"This rule has repetitive pattern: {rule}")
+
+        # if all pattern exist
+        for ele in pattern_list:
+            if ele not in self.get_graph_alpha_dict():
+                return None
+        exist_alpha_inst = self.get_exist_alpha_node_init_form_pattern(
+            pattern_list)
+
+        biggest = self.find_the_biggest_beta_node(exist_alpha_inst)
+        if biggest == None:
             return None
         else:
-            return biggest.get_action()
+            return biggest[0].get_action()
 
 
 ####
@@ -293,13 +306,4 @@ rete.add_rule(rule5)
 #print("beta nodes")
 # pprint(rete._graph_beta_dict)
 
-rete_graph_beta_name: List[str] = list(rete._graph_beta_dict.keys())
-rete_graph_beta_dict_init_list: List[object] = list(
-    rete._graph_beta_dict.values())
-beta_action: Dict[str, str] = {}
-
-for index in range(len(rete_graph_beta_name)):
-    beta_action[rete_graph_beta_name[index]
-                ] = rete_graph_beta_dict_init_list[index].get_action()
-
-pprint(beta_action)
+print(rete.query("a1 c1 b1 e1 d1 "))
