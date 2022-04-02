@@ -2,7 +2,7 @@
 Author: Innis
 Description: graph class and method
 Date: 2022-04-02 09:31:06
-LastEditTime: 2022-04-02 18:39:40
+LastEditTime: 2022-04-02 18:45:43
 FilePath: \0328P-rete\0.5\graph.py
 '''
 
@@ -402,13 +402,13 @@ class Graph:
                 break
 
 
-####
+# region rule cases
 rule1: str = "if a1 b1 c1 d1 e1 then action111"
 rule2: str = "if a1 b1 c1 d2 e2 then action222"
 rule3: str = "if d1 e1 d2 e2 then action333"
 rule4: str = "if a1 b1 d2 e2 then action444"
 rule5: str = "if a11 b11 d21 e21 then action555"
-
+# endregion
 
 rete = Graph()
 
@@ -426,12 +426,20 @@ rete = Graph()
 # print(rete.query("a1 c1 b1 e1 d1 "))
 # endregion
 
+# region import test
 
 rete.import_graph_data("data.json")
-# pprint(rete.get_graph_alpha_dict())
+pprint(rete.get_graph_alpha_dict())
 print("graph beta node:")
 pprint(rete.get_graph_beta_dict())
 print(rete.query("a1 c1 b1 e1 d1 "))
+print(rete.query("a1 b1 c1 d2 e2"))
+
+# endregion
+
+
+# region test big data
+
 # start = time.time()
 # with open("data.txt", "r") as handle:
 #     rules = handle.readlines()
@@ -464,3 +472,5 @@ print(rete.query("a1 c1 b1 e1 d1 "))
 # en = time.time()
 
 # print(f"traverse query cost:{en-st}s")
+
+# endregion
