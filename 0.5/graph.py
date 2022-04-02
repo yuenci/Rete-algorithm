@@ -2,7 +2,7 @@
 Author: Innis
 Description: graph class and method
 Date: 2022-04-02 09:31:06
-LastEditTime: 2022-04-02 12:25:49
+LastEditTime: 2022-04-02 13:57:42
 FilePath: \0328P-rete\0.5\graph.py
 '''
 
@@ -18,15 +18,13 @@ class Graph:
         self._graph_beta_dict: Dict[str, object] = {}
 
     def add_alpha_inst_to_graph_dict(self, alpha_node_inst: object) -> None:
-        self._graph_alpha_dict[alpha_node_inst.get_pattern()] = [
-            alpha_node_inst]
+        self._graph_alpha_dict[alpha_node_inst.get_pattern()] = alpha_node_inst
 
     def get_graph_alpha_dict(self) -> Dict[str, object]:
         return self._graph_alpha_dict
 
     def add_beta_inst_to_graph_dict(self, beta_node_inst: object) -> None:
-        self._graph_beta_dict[beta_node_inst.get_pattern()] = [
-            beta_node_inst]
+        self._graph_beta_dict[beta_node_inst.get_pattern()] = beta_node_inst
 
     def create_alpha_to_graph(self, pattern: str) -> object:
         alpha_inst = Alpha(pattern)
@@ -148,7 +146,7 @@ class Graph:
 
         for index in range(len(all_alpha_inst_list)):
             beta_pattern: str = temp_beta_node_inst_list[index].get_pattern(
-            ) + all_alpha_pattern_list[index]
+            ) + "-" + all_alpha_pattern_list[index]
 
             left_node_init: object = temp_beta_node_inst_list[index]
             right_node_init: object = all_alpha_inst_list[index]
@@ -278,9 +276,13 @@ rule5: str = "if a11 b11 d21 e21 then action555"
 
 rete = Graph()
 rete.add_rule(rule1)
+rete.add_rule(rule2)
+rete.add_rule(rule3)
+rete.add_rule(rule4)
+rete.add_rule(rule5)
 
 
-print("alpha nodes")
-pprint(rete.get_graph_alpha_dict())
+# print("alpha nodes")
+# pprint(rete.get_graph_alpha_dict())
 print("beta nodes")
 pprint(rete._graph_beta_dict)
