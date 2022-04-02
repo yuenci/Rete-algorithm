@@ -2,15 +2,17 @@
 Author: Innis
 Description: graph class and method
 Date: 2022-04-02 09:31:06
-LastEditTime: 2022-04-02 14:44:10
+LastEditTime: 2022-04-02 15:30:28
 FilePath: \0328P-rete\0.5\graph.py
 '''
 
 from logging import exception
+from os import times
 from typing import Union, List, Dict
 from pprint import pprint
 from node import Alpha, Beta
 import sys
+import time
 
 
 class Graph:
@@ -103,7 +105,7 @@ class Graph:
 
         # no link
         if len(duplicates) == 0:
-            return [None, []]
+            return [None, exist_alpha_inst_list]
         else:
             duplicates = duplicates[0]
 
@@ -194,7 +196,7 @@ class Graph:
 
         if len(new_pattern_list) > 0 and len(exist_alpha_pattern_list) == 0:
             '''
-            all are new pattern,input:List[str]
+            all are new pattern
             need to build new net
             '''
             exist_alpha_node_inst_list: List[object] = self.get_exist_alpha_node_init_form_pattern(
@@ -211,7 +213,7 @@ class Graph:
 
             if biggest_beta_node_inst == None:
                 '''
-                all are old pattern and no biggest,input:List[object]
+                all are old pattern and no biggest
                 need to build new net
                 '''
                 self.build_net(None, exist_alpha_node_inst_list, [], action)
@@ -223,7 +225,7 @@ class Graph:
                     '''
                 else:
                     '''
-                    all are old pattern and has biggest and left,input:List[object,List[object]]
+                    all are old pattern and has biggest and left
                     need to use biggest and the rest alpha nodes  build new net
                     '''
                     self.connect_net(biggest_beta_node_inst,
@@ -294,11 +296,11 @@ rule5: str = "if a11 b11 d21 e21 then action555"
 
 
 rete = Graph()
-rete.add_rule(rule1)
-rete.add_rule(rule2)
-rete.add_rule(rule3)
-rete.add_rule(rule4)
-rete.add_rule(rule5)
+# rete.add_rule(rule1)
+# rete.add_rule(rule2)
+# rete.add_rule(rule3)
+# rete.add_rule(rule4)
+# rete.add_rule(rule5)
 
 
 # print("alpha nodes")
@@ -306,4 +308,36 @@ rete.add_rule(rule5)
 #print("beta nodes")
 # pprint(rete._graph_beta_dict)
 
-print(rete.query("a1 c1 b1 e1 d1 "))
+# print(rete.query("a1 c1 b1 e1 d1 "))
+
+start = time.time()
+with open("data.txt", "r") as handle:
+    rules = handle.readlines()
+
+
+times = 0
+st = time.time()
+for index in range(100000):
+    rete.add_rule(rules[index].strip())
+    if index % 1000 == 0:
+        en = time.time()
+        print(f"{times},cost:{en-st} s")
+        st = time.time()
+    times += 1
+
+end = time.time()
+print(f"Bulid graph cost {end-start}s")
+
+start = time.time()
+print(rete.query("a9 b9 c9 d9 e9 f0"))
+end = time.time()
+
+print(f"rete query cost {end-start}s")
+
+st = time.time()
+for ele in rules:
+    if ele.strip() == "if a9 b9 c9 d9 e9 f0 then action99999":
+        print(ele.strip().split(" ")[-1])
+en = time.time()
+
+print(f"traverse query cost:{en-st}s")
