@@ -2,7 +2,7 @@
 Author: Innis
 Description: graph class and method
 Date: 2022-04-02 09:31:06
-LastEditTime: 2022-04-02 17:05:52
+LastEditTime: 2022-04-02 18:39:40
 FilePath: \0328P-rete\0.5\graph.py
 '''
 
@@ -36,7 +36,8 @@ class Graph:
         self.add_alpha_inst_to_graph_dict(alpha_inst)
         return alpha_inst
 
-    def create_beta_to_graph(self, pattern: str, action: str, left_node: object, right_node: object, left_weight: int = 0, right_weight: int = 0) -> object:
+    def create_beta_to_graph(self, pattern: str, action: str, left_node: object, right_node: object,
+                             left_weight: int = 0, right_weight: int = 0) -> object:
         beta_inst = Beta(pattern, action, left_node,
                          right_node, left_weight, right_weight)
         self.add_beta_inst_to_graph_dict(beta_inst)
@@ -76,13 +77,35 @@ class Graph:
 
     def get_exist_alpha_node_init_form_pattern(self, alpha_pattern: Union[str, List[str]]) -> List[object]:
         if isinstance(alpha_pattern, str):
-            return [self.get_graph_alpha_dict()[alpha_pattern]]
+            try:
+                return [self.get_graph_alpha_dict()[alpha_pattern]]
+            except:
+                return []
         elif isinstance(alpha_pattern, list):
             alpha_init_list: List[object] = []
             for ele in alpha_pattern:
-                alpha_init = self.get_graph_alpha_dict()[ele]
+                try:
+                    alpha_init = self.get_graph_alpha_dict()[ele]
+                except:
+                    return []
                 alpha_init_list.append(alpha_init)
             return alpha_init_list
+
+    def get_exist_beta_node_init_form_pattern(self, beta_pattern: Union[str, List[str]]) -> List[object]:
+        if isinstance(beta_pattern, str):
+            try:
+                return [self.get_graph_beta_dict()[beta_pattern]]
+            except:
+                return []
+        elif isinstance(beta_pattern, list):
+            beta_init_list: List[object] = []
+            for ele in beta_pattern:
+                try:
+                    beta_init = self.get_graph_beta_dict()[ele]
+                except:
+                    return []
+                beta_init_list.append(beta_init)
+            return beta_init_list
 
     def get_duplicates(self, arr: List[object]) -> object:
         hashset = set()
@@ -312,6 +335,72 @@ class Graph:
         with open("data.json", "w+") as handle:
             json.dump(graph_data_dict, handle, ensure_ascii=False)
 
+    def import_graph_data(self, json_file_path: str) -> None:
+        # create alpha
+        with open(json_file_path, "r+") as handle:
+            data_dict: Dict = json.load(handle)
+
+        alpha_data_dict = data_dict["alpha"]
+        alpha_pattern_list: List[str] = list(alpha_data_dict.keys())
+        for ele in alpha_pattern_list:
+            self.create_alpha_to_graph(ele)
+
+        beta_data_dict = data_dict["beta"]
+        beta_pattern_list: List[str] = list(beta_data_dict.keys())
+
+        # creatr beta what left foot and right both are alpha node
+        beta_with_two_alpha_foot_list: List[str] = []
+
+        for ele in alpha_data_dict:
+            edges_List = alpha_data_dict[ele].keys()
+            for el in edges_List:
+                if len(el.split("-")) == 2 and el not in beta_with_two_alpha_foot_list:
+                    beta_with_two_alpha_foot_list.append(el)
+
+        for ele in beta_with_two_alpha_foot_list:
+            beta_pattern = ele
+            left_node_pattern, right_node_pattern = ele.split("-")
+
+            action = beta_data_dict[beta_pattern]["action"]
+
+            left_node_inst = self.get_exist_alpha_node_init_form_pattern(
+                left_node_pattern)[0]
+            right_node_inst = self.get_exist_alpha_node_init_form_pattern(
+                right_node_pattern)[0]
+
+            left_node_weight = alpha_data_dict[left_node_pattern][ele]
+            right_node_weight = alpha_data_dict[right_node_pattern][ele]
+
+            self.create_beta_to_graph(
+                beta_pattern, action, left_node_inst, right_node_inst, left_node_weight, right_node_weight)
+            beta_pattern_list.remove(ele)
+
+        while True:
+            for ele in beta_pattern_list:
+                left_node_pattern = beta_data_dict[ele]["left_node"]
+                if left_node_pattern not in beta_pattern_list:
+                    left_node_inst = self.get_exist_beta_node_init_form_pattern(
+                        left_node_pattern)[0]
+                else:
+                    continue
+
+                left_node_pattern = left_node_inst.get_pattern()
+
+                left_node_weight = beta_data_dict[left_node_pattern]["edge"][ele]
+
+                action: str = beta_data_dict[ele]["action"]
+                right_node_inst = self.get_exist_alpha_node_init_form_pattern(
+                    beta_data_dict[ele]["right_node"])[0]
+                right_node_pattern = right_node_inst.get_pattern()
+                right_node_weight = alpha_data_dict[right_node_pattern][ele]
+
+                self.create_beta_to_graph(
+                    ele, action, left_node_inst, right_node_inst, left_node_weight, right_node_weight)
+                beta_pattern_list.remove(ele)
+
+            if len(beta_pattern_list) == 0:
+                break
+
 
 ####
 rule1: str = "if a1 b1 c1 d1 e1 then action111"
@@ -324,13 +413,11 @@ rule5: str = "if a11 b11 d21 e21 then action555"
 rete = Graph()
 
 # region small test data
-rete.add_rule(rule1)
-rete.add_rule(rule2)
-rete.add_rule(rule3)
-rete.add_rule(rule4)
-rete.add_rule(rule5)
-
-rete.export_graph_data()
+# rete.add_rule(rule1)
+# rete.add_rule(rule2)
+# rete.add_rule(rule3)
+# rete.add_rule(rule4)
+# rete.add_rule(rule5)
 
 # print("alpha nodes")
 #print("beta nodes")
@@ -339,6 +426,12 @@ rete.export_graph_data()
 # print(rete.query("a1 c1 b1 e1 d1 "))
 # endregion
 
+
+rete.import_graph_data("data.json")
+# pprint(rete.get_graph_alpha_dict())
+print("graph beta node:")
+pprint(rete.get_graph_beta_dict())
+print(rete.query("a1 c1 b1 e1 d1 "))
 # start = time.time()
 # with open("data.txt", "r") as handle:
 #     rules = handle.readlines()
