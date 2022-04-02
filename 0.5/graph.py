@@ -2,17 +2,16 @@
 Author: Innis
 Description: graph class and method
 Date: 2022-04-02 09:31:06
-LastEditTime: 2022-04-02 15:30:28
+LastEditTime: 2022-04-02 17:05:52
 FilePath: \0328P-rete\0.5\graph.py
 '''
 
-from logging import exception
-from os import times
 from typing import Union, List, Dict
 from pprint import pprint
 from node import Alpha, Beta
 import sys
 import time
+import json
 
 
 class Graph:
@@ -28,6 +27,9 @@ class Graph:
 
     def add_beta_inst_to_graph_dict(self, beta_node_inst: object) -> None:
         self._graph_beta_dict[beta_node_inst.get_pattern()] = beta_node_inst
+
+    def get_graph_beta_dict(self) -> Dict[str, object]:
+        return self._graph_beta_dict
 
     def create_alpha_to_graph(self, pattern: str) -> object:
         alpha_inst = Alpha(pattern)
@@ -110,7 +112,7 @@ class Graph:
             duplicates = duplicates[0]
 
         del exist_alpha_inst_Dict[duplicates.get_left_node().get_pattern()]
-        del exist_alpha_inst_Dict[duplicates.get_rigth_node().get_pattern()]
+        del exist_alpha_inst_Dict[duplicates.get_right_node().get_pattern()]
 
         highest: object = duplicates
         flag = False
@@ -118,7 +120,7 @@ class Graph:
             higher_beta_inst_list: List[object] = highest.get_edge_object_list(
             )
             for ele in higher_beta_inst_list:
-                right_side_node_obj: object = ele.get_rigth_node()
+                right_side_node_obj: object = ele.get_right_node()
                 right_side_node_pattern: str = right_side_node_obj.get_pattern()
                 if right_side_node_pattern in exist_alpha_inst_Dict:
                     highest: object = ele
@@ -286,6 +288,30 @@ class Graph:
         else:
             return biggest[0].get_action()
 
+    def export_graph_data(self) -> None:
+        graph_data_dict = {"alpha": {}, "beta": {}}
+
+        all_ahpha_pattern: List[str] = list(self.get_graph_alpha_dict().keys())
+        all_ahpha_inst: List[object] = list(self.get_graph_alpha_dict().values()
+                                            )
+        for index in range(len(all_ahpha_pattern)):
+            graph_data_dict["alpha"][all_ahpha_pattern[index]
+                                     ] = all_ahpha_inst[index].get_edge_pattern_weight_dict()
+
+        all_beta_pattern: List[str] = list(self.get_graph_beta_dict().keys())
+        all_beta_inst: List[object] = list(self.get_graph_beta_dict().values())
+
+        for index in range(len(all_beta_pattern)):
+            graph_data_dict["beta"][all_beta_pattern[index]] = {
+                "action": all_beta_inst[index].get_action(),
+                "left_node": all_beta_inst[index].get_left_node().get_pattern(),
+                "right_node": all_beta_inst[index].get_right_node().get_pattern(),
+                "edge": all_beta_inst[index].get_edge_pattern_weight_dict()
+            }
+
+        with open("data.json", "w+") as handle:
+            json.dump(graph_data_dict, handle, ensure_ascii=False)
+
 
 ####
 rule1: str = "if a1 b1 c1 d1 e1 then action111"
@@ -296,48 +322,52 @@ rule5: str = "if a11 b11 d21 e21 then action555"
 
 
 rete = Graph()
-# rete.add_rule(rule1)
-# rete.add_rule(rule2)
-# rete.add_rule(rule3)
-# rete.add_rule(rule4)
-# rete.add_rule(rule5)
 
+# region small test data
+rete.add_rule(rule1)
+rete.add_rule(rule2)
+rete.add_rule(rule3)
+rete.add_rule(rule4)
+rete.add_rule(rule5)
+
+rete.export_graph_data()
 
 # print("alpha nodes")
-# pprint(rete.get_graph_alpha_dict())
 #print("beta nodes")
 # pprint(rete._graph_beta_dict)
 
 # print(rete.query("a1 c1 b1 e1 d1 "))
+# endregion
 
-start = time.time()
-with open("data.txt", "r") as handle:
-    rules = handle.readlines()
+# start = time.time()
+# with open("data.txt", "r") as handle:
+#     rules = handle.readlines()
 
 
-times = 0
-st = time.time()
-for index in range(100000):
-    rete.add_rule(rules[index].strip())
-    if index % 1000 == 0:
-        en = time.time()
-        print(f"{times},cost:{en-st} s")
-        st = time.time()
-    times += 1
+# times = 0
+# st = time.time()
+# for index in range(1000):
+#     rete.add_rule(rules[index].strip())
+#     if index % 1000 == 0:
+#         en = time.time()
+#         print(f"{times},cost:{en-st} s")
+#         st = time.time()
+#     times += 1
 
-end = time.time()
-print(f"Bulid graph cost {end-start}s")
+# end = time.time()
+# print(f"Bulid graph cost {end-start}s")
 
-start = time.time()
-print(rete.query("a9 b9 c9 d9 e9 f0"))
-end = time.time()
 
-print(f"rete query cost {end-start}s")
+# start = time.time()
+# print(rete.query("a9 b9 c9 d9 e9 f0"))
+# end = time.time()
 
-st = time.time()
-for ele in rules:
-    if ele.strip() == "if a9 b9 c9 d9 e9 f0 then action99999":
-        print(ele.strip().split(" ")[-1])
-en = time.time()
+# print(f"rete query cost {end-start}s")
 
-print(f"traverse query cost:{en-st}s")
+# st = time.time()
+# for ele in rules:
+#     if ele.strip() == "if a9 b9 c9 d9 e9 f0 then action99999":
+#         print(ele.strip().split(" ")[-1])
+# en = time.time()
+
+# print(f"traverse query cost:{en-st}s")

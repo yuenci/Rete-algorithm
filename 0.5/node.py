@@ -2,7 +2,7 @@
 Author: Innis
 Description: alpha node and beta node class
 Date: 2022-04-02 09:24:50
-LastEditTime: 2022-04-02 14:26:18
+LastEditTime: 2022-04-02 17:06:09
 FilePath: \0328P-rete\0.5\node.py
 '''
 '''
@@ -35,6 +35,13 @@ class Alpha:
     def get_edge_object_list(self) -> List[object]:
         return list(self._edges.keys())
 
+    def get_edge_pattern_weight_dict(self) -> Dict[str, int]:
+        pattern_weight_dict: Dict[str, int] = {}
+        for beta_init, beta_weight in self.get_edge_dict().items():
+            beta_pattern: str = beta_init.get_pattern()
+            pattern_weight_dict[beta_pattern] = beta_weight
+        return pattern_weight_dict
+
 
 class Beta:
     def __init__(self, pattern: str, action: str, left_node: object, right_node: object, left_weight: int = 0, right_weight: int = 0) -> None:
@@ -54,7 +61,7 @@ class Beta:
     def get_left_node(self) -> object:
         return self._left_node
 
-    def get_rigth_node(self) -> object:
+    def get_right_node(self) -> object:
         return self._right_node
 
     def get_left_right_node_list(self) -> List[object]:
@@ -78,3 +85,10 @@ class Beta:
     def notify_nodes_add_edge(self, original_beta_node: object, left_node_inst: object, right_node_inst: object, left_weight: int, right_weight: int) -> None:
         left_node_inst.add_edge(original_beta_node, left_weight)
         right_node_inst.add_edge(original_beta_node, right_weight)
+
+    def get_edge_pattern_weight_dict(self) -> Dict[str, int]:
+        pattern_weight_dict: Dict[str, int] = {}
+        for beta_init, beta_weight in self.get_edge_dict().items():
+            beta_pattern: str = beta_init.get_pattern()
+            pattern_weight_dict[beta_pattern] = beta_weight
+        return pattern_weight_dict
