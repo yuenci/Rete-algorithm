@@ -2,7 +2,7 @@
 Author: Innis
 Description: graph class and method
 Date: 2022-04-02 09:31:06
-LastEditTime: 2022-04-02 13:57:42
+LastEditTime: 2022-04-02 14:32:35
 FilePath: \0328P-rete\0.5\graph.py
 '''
 
@@ -91,8 +91,6 @@ class Graph:
 
     def find_the_biggest_beta_node(self, exist_alpha_inst_list: List[object]) -> List[Union[object, List[object]]]:
         exist_alpha_inst_Dict: Dict[str:object] = {}
-        pprint(exist_alpha_inst_list)
-        print(sys._getframe().f_lineno, "line")
         for node_inst in exist_alpha_inst_list:
             exist_alpha_inst_Dict[node_inst.get_pattern()] = node_inst
 
@@ -152,9 +150,10 @@ class Graph:
             right_node_init: object = all_alpha_inst_list[index]
 
             beta_inst = self.create_beta_to_graph(
-                beta_pattern, action, left_node_init, right_node_init)
+                beta_pattern, None, left_node_init, right_node_init)
 
             temp_beta_node_inst_list.append(beta_inst)
+        temp_beta_node_inst_list[-1].set_action(action)
 
     def build_net(self, biggest: object, rest_of_alpha_inst_list: List[object], new_pattern: List[str], action: str) -> None:
         new_alpha_inst_list: List[object] = []
@@ -181,9 +180,10 @@ class Graph:
                 right_node_init: object = all_alpha_inst_list[index]
 
             beta_inst = self.create_beta_to_graph(
-                beta_pattern, action, left_node_init, right_node_init)
+                beta_pattern, None, left_node_init, right_node_init)
 
             temp_beta_node_inst_list.append(beta_inst)
+        temp_beta_node_inst_list[-1].set_action(action)
 
     def add_rule(self, rule: str) -> None:
         action: str = self.get_action_from_rule(rule)
@@ -215,7 +215,6 @@ class Graph:
                 '''
                 self.build_net(None, exist_alpha_node_inst_list, [], action)
             else:
-                print("all are old pattern and has biggest")
                 if len(except_biggest_the_rest_of_alpha_inst) == 0:
                     '''
                     all are old pattern and has biggest and no left
@@ -246,7 +245,6 @@ class Graph:
                     None, except_biggest_the_rest_of_alpha_inst, new_pattern_list, action)
             # all are old pattern and has biggest
             else:
-                print("all are old pattern and has biggest")
                 if len(except_biggest_the_rest_of_alpha_inst) == 0:
                     '''
                     there are old pattern , new pattern and has biggest and no left
@@ -264,6 +262,14 @@ class Graph:
 
         else:
             raise Exception(f"This rule has some problem: {rule}")
+
+    def query(self, rule: str) -> str:
+        pattern_list: List = self.split_rule_pattern_to_list(rule)
+        biggest = self.find_the_biggest_beta_node(pattern_list)[0]
+        if biggest = None:
+            return None
+        else:
+            return biggest.get_action()
 
 
 ####
@@ -284,5 +290,16 @@ rete.add_rule(rule5)
 
 # print("alpha nodes")
 # pprint(rete.get_graph_alpha_dict())
-print("beta nodes")
-pprint(rete._graph_beta_dict)
+#print("beta nodes")
+# pprint(rete._graph_beta_dict)
+
+rete_graph_beta_name: List[str] = list(rete._graph_beta_dict.keys())
+rete_graph_beta_dict_init_list: List[object] = list(
+    rete._graph_beta_dict.values())
+beta_action: Dict[str, str] = {}
+
+for index in range(len(rete_graph_beta_name)):
+    beta_action[rete_graph_beta_name[index]
+                ] = rete_graph_beta_dict_init_list[index].get_action()
+
+pprint(beta_action)

@@ -2,7 +2,7 @@
 Author: Innis
 Description: alpha node and beta node class
 Date: 2022-04-02 09:24:50
-LastEditTime: 2022-04-02 09:45:36
+LastEditTime: 2022-04-02 14:26:18
 FilePath: \0328P-rete\0.5\node.py
 '''
 '''
@@ -71,6 +71,9 @@ class Beta:
 
     def get_action(self) -> str:
         return self._action
+
+    def set_action(self, action: str) -> None:
+        self._action = action
 
     def notify_nodes_add_edge(self, original_beta_node: object, left_node_inst: object, right_node_inst: object, left_weight: int, right_weight: int) -> None:
         left_node_inst.add_edge(original_beta_node, left_weight)
