@@ -9,7 +9,7 @@
 
   <h3 align="center">Best-README-Template</h3>
   <p align="center">
-    Implementation of Rule engine's Rete algorithm in Python
+    Improve the retrieval speed of expert system when checking facts in the knowledge base
   </p>
 </div>
 
