@@ -2,7 +2,7 @@
 Author: Innis
 Description: graph class and method
 Date: 2022-04-02 09:31:06
-LastEditTime: 2022-04-02 18:45:43
+LastEditTime: 2022-04-02 21:58:20
 FilePath: \0328P-rete\0.5\graph.py
 '''
 
@@ -413,27 +413,27 @@ rule5: str = "if a11 b11 d21 e21 then action555"
 rete = Graph()
 
 # region small test data
-# rete.add_rule(rule1)
-# rete.add_rule(rule2)
-# rete.add_rule(rule3)
-# rete.add_rule(rule4)
-# rete.add_rule(rule5)
-
+rete.add_rule(rule1)
+rete.add_rule(rule2)
+rete.add_rule(rule3)
+rete.add_rule(rule4)
+rete.add_rule(rule5)
+print("build graph Done")
 # print("alpha nodes")
 #print("beta nodes")
 # pprint(rete._graph_beta_dict)
 
-# print(rete.query("a1 c1 b1 e1 d1 "))
+print(rete.query("a1 c1 b1 e1 d1 "))
 # endregion
 
 # region import test
 
-rete.import_graph_data("data.json")
-pprint(rete.get_graph_alpha_dict())
-print("graph beta node:")
-pprint(rete.get_graph_beta_dict())
-print(rete.query("a1 c1 b1 e1 d1 "))
-print(rete.query("a1 b1 c1 d2 e2"))
+# rete.import_graph_data("data.json")
+# pprint(rete.get_graph_alpha_dict())
+# print("graph beta node:")
+# pprint(rete.get_graph_beta_dict())
+# print(rete.query("a1 c1 b1 e1 d1 "))
+# print(rete.query("a1 b1 c1 d2 e2"))
 
 # endregion
 
