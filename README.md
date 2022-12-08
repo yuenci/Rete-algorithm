@@ -7,7 +7,7 @@
 <br />
 <div align="center">
 
-  <h3 align="center">Best-README-Template</h3>
+  <h3 align="center">Rete-algorithm</h3>
   <p align="center">
     Improve the retrieval speed of expert system when checking facts in the knowledge base
   </p>
